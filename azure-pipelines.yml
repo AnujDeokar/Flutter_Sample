@@ -1,0 +1,31 @@
+name: $(Date:yyyyMMdd)$(Rev:r)
+variables:
+  projectDirectory: FlutterTst
+trigger:
+- master
+jobs:
+  - job: Android
+    pool:
+      vmImage: 'macOS-latest'
+    steps:
+    - task: FlutterInstall@0
+      inputs:
+        channel: 'stable'
+        version: 'latest'
+    - task: FlutterBuild@0
+      inputs:
+        target: 'apk,ios'
+        projectDirectory: '.'
+        flutterDirectory: 'c:\src\flutter\bin'
+        iosCodesign: false
+    
+    - task: CopyFiles@2
+      inputs:
+        contents: '**/*.apk,**/*.ipa'
+        targetFolder: '$(build.artifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        artifactName: 'drop'
+
+
+        
